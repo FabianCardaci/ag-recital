@@ -1,6 +1,7 @@
 package com.utn.ia.recital.controller;
 
 import com.google.common.collect.Lists;
+import com.utn.ia.recital.pojo.AgResTO;
 import com.utn.ia.recital.service.RecitalService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,11 +25,11 @@ public class RecitalController {
     private RecitalService service;
 
     @GetMapping("/run")
-    public List<String> run() {
+    public AgResTO run() {
         log.info("Request to run AG");
-        final String response = service.getSomething();
+        final AgResTO response = service.getFitness();
         log.info("Response to run AG {}", response);
-        return Lists.newArrayList(response);
+        return response;
     }
 
 }

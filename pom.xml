@@ -54,7 +54,7 @@
         <dependency>
             <groupId>io.jenetics</groupId>
             <artifactId>jenetics</artifactId>
-            <version>3.7.0</version>
+            <version>4.1.0</version>
         </dependency>
     </dependencies>
 
