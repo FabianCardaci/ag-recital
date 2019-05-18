@@ -1,13 +1,23 @@
 package com.utn.ia.recital.pojo;
 
+import lombok.Getter;
+
+@Getter
 public enum Price {
 
-    MILLION_1,
+    MILLION_1(1),
+    MILLION_2(2),
+    MILLION_3(3),
+    MILLION_4(4),
+    MILLION_5(5),
+    MILLION_6(6),
+    MILLION_7(7),
+    MILLION_8(8);
 
-    MILLION_2,
+    private Integer value;
 
-    MILLION_5,
-
-    MILLION_10,
+    Price(final Integer value) {
+        this.value = value;
+    }
 
 }
