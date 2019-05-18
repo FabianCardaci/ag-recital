@@ -2,8 +2,12 @@ package com.utn.ia.recital.pojo;
 
 public enum Category {
 
-    LOW,
+    LEGEND,
+
     MEDIUM,
-    HIGH
+
+    HIGH,
+
+    LOW
 
 }
