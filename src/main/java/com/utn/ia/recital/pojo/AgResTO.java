@@ -13,6 +13,6 @@ public class AgResTO {
 
     private Double fitness;
 
-    private List<DayTO> chromosome;
+    private List<DayResTO> chromosome;
 
 }

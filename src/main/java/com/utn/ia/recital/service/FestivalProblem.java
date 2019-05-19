@@ -12,11 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.util.List;
 import java.util.function.Function;
 import java.util.stream.IntStream;
-
-import static java.util.stream.Collectors.toList;
 
 
 @Service
@@ -52,11 +49,11 @@ public class FestivalProblem implements Problem<ISeq<DayTO>, EnumGene<DayTO>, Do
                 .collect(ISeq.toISeq());
     }
 
-    private List<BandTO> randomBands() {
+    private ISeq<BandTO> randomBands() {
         return IntStream.iterate(0, i -> i+1)
                 .limit(4)
                 .mapToObj(i -> RANDOM.nextObject(BandTO.class))
-                .collect(toList());
+                .collect(ISeq.toISeq());
     }
 
 }
