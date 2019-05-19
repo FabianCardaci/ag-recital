@@ -9,11 +9,14 @@ import io.jenetics.engine.Problem;
 import io.jenetics.util.ISeq;
 import org.jeasy.random.EasyRandom;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.util.function.Function;
 import java.util.stream.IntStream;
+
+import static io.jenetics.util.ISeq.toISeq;
 
 
 @Service
@@ -24,17 +27,26 @@ public class FestivalProblem implements Problem<ISeq<DayTO>, EnumGene<DayTO>, Do
     @Autowired
     private FitnessService fitnessService;
 
-    private ISeq<DayTO> _days;
+    @Value("${festival.days}")
+    private Integer festivalDays;
+
+    @Value("${day.bands}")
+    private Integer dayBands;
+
+    @Value("${universe.size}")
+    private Integer universeSize;
+
+    private ISeq<DayTO> universe;
 
 
     @PostConstruct
     public void init() {
-        _days = initialPopulation();
+        universe = createUniverse();
     }
 
     @Override
     public Codec<ISeq<DayTO>, EnumGene<DayTO>> codec() {
-        return Codecs.ofSubSet(_days,7);
+        return Codecs.ofSubSet(universe, festivalDays);
     }
 
     @Override
@@ -42,18 +54,18 @@ public class FestivalProblem implements Problem<ISeq<DayTO>, EnumGene<DayTO>, Do
         return days -> fitnessService.fitness(days);
     }
 
-    private ISeq<DayTO> initialPopulation() {
+    private ISeq<DayTO> createUniverse() {
         return IntStream.iterate(0, i -> i+1)
-                .limit(10000)
+                .limit(universeSize)
                 .mapToObj(i -> new DayTO(randomBands()))
-                .collect(ISeq.toISeq());
+                .collect(toISeq());
     }
 
     private ISeq<BandTO> randomBands() {
         return IntStream.iterate(0, i -> i+1)
-                .limit(4)
+                .limit(dayBands)
                 .mapToObj(i -> RANDOM.nextObject(BandTO.class))
-                .collect(ISeq.toISeq());
+                .collect(toISeq());
     }
 
 }

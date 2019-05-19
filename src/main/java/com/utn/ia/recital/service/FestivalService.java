@@ -9,6 +9,7 @@ import io.jenetics.engine.Engine;
 import io.jenetics.engine.EvolutionStatistics;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,17 +25,29 @@ public class FestivalService {
     @Autowired
     private FestivalProblem problem;
 
+    @Value("${population.size}")
+    private Integer populationSize;
+
+    @Value("${mutation.probability}")
+    private Double mutationProbability;
+
+    @Value("${crossover.probability}")
+    private Double crossoverProbability;
+
+    @Value("${bad-generations.max}")
+    private Integer badGenerationsMax;
+
+
     public AgResTO runAg() {
 
 
         final Engine<EnumGene<DayTO>, Double> engine = Engine.builder(problem)
                 .maximizing()
-                .populationSize(500)
-                .survivorsSelector(new TournamentSelector<>(50))
+                .populationSize(populationSize)
                 .offspringSelector(new RouletteWheelSelector<>())
                 .alterers(
-                        new Mutator<>(0.115),
-                        new SinglePointCrossover<>(0.16))
+                        new Mutator<>(mutationProbability),
+                        new SinglePointCrossover<>(crossoverProbability))
                 .build();
 
 
@@ -42,14 +55,13 @@ public class FestivalService {
 
         Phenotype<EnumGene<DayTO>,Double> best =
                 engine.stream()
-                        .limit(bySteadyFitness(7))
-                        .limit(100)
+                        .limit(bySteadyFitness(badGenerationsMax))
                         .peek(statistics)
                         .collect(toBestPhenotype());
 
-        log.info("Estadísticas:"+statistics);
-        log.info("Minimo: " + best.getFitness());
-        log.info("Orden: "+ best.getGenotype().toString());
+        log.info("Estadísticas: " + statistics);
+        log.info("Aptitud: " + best.getFitness());
+        log.info("Solución: " + best.getGenotype().toString());
 
 
         List<DayTO> chromosome = best.getGenotype().getChromosome().stream().map(EnumGene::getAllele).collect(toList());
