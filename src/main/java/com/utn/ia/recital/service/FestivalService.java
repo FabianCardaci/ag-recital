@@ -6,6 +6,7 @@ import com.utn.ia.recital.pojo.DayResTO;
 import com.utn.ia.recital.pojo.DayTO;
 import io.jenetics.*;
 import io.jenetics.engine.Engine;
+import io.jenetics.engine.EvolutionResult;
 import io.jenetics.engine.EvolutionStatistics;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,8 +39,11 @@ public class FestivalService {
     private Integer badGenerationsMax;
 
 
+    static Phenotype<EnumGene<DayTO>,Double> bestInRun;
+    
     public AgResTO runAg() {
-
+        
+        bestInRun = null;
 
         final Engine<EnumGene<DayTO>, Double> engine = Engine.builder(problem)
                 .maximizing()
@@ -57,13 +61,15 @@ public class FestivalService {
                 engine.stream()
                         .limit(bySteadyFitness(badGenerationsMax))
                         .peek(statistics)
+                        .peek(FestivalService::updateBestInRun)
                         .collect(toBestPhenotype());
 
         log.info("Estadísticas: " + statistics);
         log.info("Aptitud: " + best.getFitness());
         log.info("Solución: " + best.getGenotype().toString());
+        log.info("Mejor phenotipo de la corrida: " + bestInRun.getGenotype().toString());
 
-
+        
         List<DayTO> chromosome = best.getGenotype().getChromosome().stream().map(EnumGene::getAllele).collect(toList());
 
         List<DayResTO> dayResponses = chromosome.stream().map(day -> {
@@ -75,6 +81,12 @@ public class FestivalService {
         }).collect(toList());
 
         return new AgResTO(best.getFitness(), dayResponses);
+    }
+        
+    private static void updateBestInRun(final EvolutionResult<EnumGene<DayTO>, Double> result) {
+        if (bestInRun == null || bestInRun.compareTo(result.getBestPhenotype()) < 0) {
+            bestInRun = result.getBestPhenotype();
+        }
     }
 
 }
