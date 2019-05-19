@@ -13,10 +13,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.util.List;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 
 import static io.jenetics.util.ISeq.toISeq;
+import static java.util.stream.Collectors.toList;
 
 
 @Service
@@ -61,11 +63,11 @@ public class FestivalProblem implements Problem<ISeq<DayTO>, EnumGene<DayTO>, Do
                 .collect(toISeq());
     }
 
-    private ISeq<BandTO> randomBands() {
+    private List<BandTO> randomBands() {
         return IntStream.iterate(0, i -> i+1)
                 .limit(dayBands)
                 .mapToObj(i -> RANDOM.nextObject(BandTO.class))
-                .collect(toISeq());
+                .collect(toList());
     }
 
 }

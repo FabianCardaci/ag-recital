@@ -2,7 +2,6 @@ package com.utn.ia.recital.service;
 
 
 import com.utn.ia.recital.pojo.AgResTO;
-import com.utn.ia.recital.pojo.DayResTO;
 import com.utn.ia.recital.pojo.DayTO;
 import io.jenetics.*;
 import io.jenetics.engine.Engine;
@@ -72,15 +71,7 @@ public class FestivalService {
         
         List<DayTO> chromosome = best.getGenotype().getChromosome().stream().map(EnumGene::getAllele).collect(toList());
 
-        List<DayResTO> dayResponses = chromosome.stream().map(day -> {
-
-            DayResTO dayResponse = new DayResTO();
-            dayResponse.setBands(day.getBands().stream().collect(toList()));
-            return dayResponse;
-
-        }).collect(toList());
-
-        return new AgResTO(best.getFitness(), dayResponses);
+        return new AgResTO(best.getFitness(), chromosome);
     }
         
     private static void updateBestInRun(final EvolutionResult<EnumGene<DayTO>, Double> result) {

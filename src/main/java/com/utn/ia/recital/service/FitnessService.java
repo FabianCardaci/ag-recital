@@ -4,9 +4,10 @@ import com.utn.ia.recital.pojo.DayTO;
 import com.utn.ia.recital.pojo.Genre;
 import com.utn.ia.recital.pojo.Language;
 import io.jenetics.util.ISeq;
-import io.jenetics.util.Seq;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import java.util.Collection;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.utn.ia.recital.pojo.Category.LEGEND;
@@ -120,7 +121,7 @@ public class FitnessService {
      * Penalize if festival overcome the maximum budget
      */
     private Double penaltyForBudget(final ISeq<DayTO> days) {
-        int budget = days.stream().map(DayTO::getBands).flatMap(Seq::stream).mapToInt(it -> it.getPrice().getValue()).sum();
+        int budget = days.stream().map(DayTO::getBands).flatMap(Collection::stream).mapToInt(it -> it.getPrice().getValue()).sum();
         return (budget < maximumBudget) ? DOUBLE_ZERO : budgetPenalty;
     }
 
