@@ -40,14 +40,15 @@ public class FitnessService {
     private Double genreFitness;
 
 
-
+    /**
+     * Check individual and calculate fitness
+     */
     public Double fitness(final ISeq<DayTO> days) {
         checkArgument(requiredDays(days), format("Require %s days", festivalDays));
         checkArgument(requiredBands(days), format("Require %s bands by day", dayBands));
 
         return safeFitness(days);
     }
-
 
     private boolean requiredDays(final ISeq<DayTO> days) {
         return size(days) == festivalDays;
@@ -57,6 +58,11 @@ public class FitnessService {
         return days.stream().allMatch(day -> size(day.getBands()) == dayBands);
     }
 
+
+
+    /**
+     * Calculate fitness
+     */
     private Double safeFitness(final ISeq<DayTO> days) {
         double result = 0;
 
@@ -68,6 +74,9 @@ public class FitnessService {
         return result;
     }
 
+    /**
+     * Reward by each day with a legend band
+     */
     private double fitnessForLegend(final ISeq<DayTO> days) {
         long daysWithLegend = days.stream().filter(day ->
                 day.getBands().stream().anyMatch(band -> LEGEND.equals(band.getCategory()))
@@ -75,6 +84,9 @@ public class FitnessService {
         return (daysWithLegend * legendFitness);
     }
 
+    /**
+     * Reward by each day with 3 bands of same genre
+     */
     private double fitnessForSameGenre(final ISeq<DayTO> days) {
         long daysWithSameGenre = days.stream().filter(
                 this::sameGenre
@@ -88,6 +100,9 @@ public class FitnessService {
         );
     }
 
+    /**
+     * Reward by each day with all bands in same language
+     */
     private double fitnessForSameLanguage(final ISeq<DayTO> days) {
         long daysWithSameLanguage = days.stream().filter(
                 this::sameLanguage
@@ -101,6 +116,9 @@ public class FitnessService {
         );
     }
 
+    /**
+     * Penalize if festival overcome the maximum budget
+     */
     private Double penaltyForBudget(final ISeq<DayTO> days) {
         int budget = days.stream().map(DayTO::getBands).flatMap(Seq::stream).mapToInt(it -> it.getPrice().getValue()).sum();
         return (budget < maximumBudget) ? DOUBLE_ZERO : budgetPenalty;
