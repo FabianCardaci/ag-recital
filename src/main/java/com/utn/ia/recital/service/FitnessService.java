@@ -2,8 +2,8 @@ package com.utn.ia.recital.service;
 
 import com.utn.ia.recital.pojo.DayTO;
 import com.utn.ia.recital.pojo.Genre;
+import com.utn.ia.recital.pojo.Language;
 import io.jenetics.util.ISeq;
-import io.jenetics.util.Seq;
 import org.springframework.stereotype.Service;
 
 import static com.utn.ia.recital.pojo.Category.LEGEND;
@@ -33,9 +33,10 @@ public class FitnessService {
     private Double safeFitness(final ISeq<DayTO> days) {
         double result = 0;
 
-//        result += fitnessForLegend(days);
-//        result += fitnessForSameGenre(days);
-        result += fitnessForRock(days);
+        result += fitnessForLegend(days);
+        result += fitnessForSameGenre(days);
+        result += fitnessForSameLanguage(days);
+
         return result;
     }
 
@@ -59,8 +60,17 @@ public class FitnessService {
         );
     }
 
-    private double fitnessForRock(final ISeq<DayTO> days) {
-        return days.stream().map(DayTO::getBands).flatMap(Seq::stream).filter(band -> Genre.ROCK.equals(band.getGenre())).count();
+    private double fitnessForSameLanguage(final ISeq<DayTO> days) {
+        long daysWithSameLanguage = days.stream().filter(
+                this::sameLanguage
+        ).count();
+        return (double) (daysWithSameLanguage * 30);
+    }
+
+    private boolean sameLanguage(final DayTO day) {
+        return stream(Language.values()).anyMatch(genre ->
+                day.getBands().stream().filter(band -> genre.equals(band.getCountry().getLanguage())).count() >= 4
+        );
     }
 
 }
