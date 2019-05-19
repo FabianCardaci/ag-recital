@@ -37,12 +37,10 @@ public class FestivalService {
     @Value("${bad-generations.max}")
     private Integer badGenerationsMax;
 
-
-    static Phenotype<EnumGene<DayTO>,Double> bestInRun;
+    private Phenotype<EnumGene<DayTO>,Double> bestOflastGeneration;
     
     public AgResTO runAg() {
         
-        bestInRun = null;
 
         final Engine<EnumGene<DayTO>, Double> engine = Engine.builder(problem)
                 .maximizing()
@@ -60,24 +58,22 @@ public class FestivalService {
                 engine.stream()
                         .limit(bySteadyFitness(badGenerationsMax))
                         .peek(statistics)
-                        .peek(FestivalService::updateBestInRun)
+                        .peek(this::updateBestInLastRun)
                         .collect(toBestPhenotype());
 
         log.info("Estadísticas: " + statistics);
-        log.info("Aptitud: " + best.getFitness());
-        log.info("Solución: " + best.getGenotype().toString());
-        log.info("Mejor phenotipo de la corrida: " + bestInRun.getGenotype().toString());
+        log.info("Aptitud del mejor individuo de todas las generaciones: " + best.getFitness());
+        log.info("Mejor individuo de todas las generaciones: " + best.getGenotype().toString());
+        log.info("Aptitud del mejor individuo de la última generación: " + bestOflastGeneration.getFitness());
+        log.info("Mejor individuo de la última generación: " + bestOflastGeneration.getGenotype().toString());
 
-        
         List<DayTO> chromosome = best.getGenotype().getChromosome().stream().map(EnumGene::getAllele).collect(toList());
 
         return new AgResTO(best.getFitness(), chromosome);
     }
         
-    private static void updateBestInRun(final EvolutionResult<EnumGene<DayTO>, Double> result) {
-        if (bestInRun == null || bestInRun.compareTo(result.getBestPhenotype()) < 0) {
-            bestInRun = result.getBestPhenotype();
-        }
+    private void updateBestInLastRun(final EvolutionResult<EnumGene<DayTO>, Double> result) {
+        bestOflastGeneration = result.getBestPhenotype();
     }
 
 }
