@@ -22,8 +22,11 @@ public class FestivalService {
     @Autowired
     private FestivalProblem problem;
 
+    static Phenotype<EnumGene<DayTO>,Double> bestInRun;
+    
     public AgResTO runAg() {
-
+        
+        bestInRun = null;
 
         final Engine<EnumGene<DayTO>, Double> engine = Engine.builder(problem)
                 .maximizing()
@@ -42,16 +45,25 @@ public class FestivalService {
                 engine.stream()
                         .limit(40000)
                         .peek(statistics)
+                        .peek(FestivalService::updateBestInRun)
                         .collect(EvolutionResult.toBestPhenotype());
 
         log.info("Estadísticas:"+statistics);
         log.info("Minimo: " + best.getFitness());
         log.info("Orden: "+ best.getGenotype().toString());
+        log.info("Mejor phenotipo de la corrida: " + bestInRun.getGenotype().toString());
 
-
+        
+        
         List<DayTO> chromosome = best.getGenotype().getChromosome().stream().map(EnumGene::getAllele).collect(toList());
 
         return new AgResTO(best.getFitness(), chromosome);
+    }
+        
+    private static void updateBestInRun(final EvolutionResult<EnumGene<DayTO>, Double> result) {
+        if (bestInRun == null || bestInRun.compareTo(result.getBestPhenotype()) < 0) {
+            bestInRun = result.getBestPhenotype();
+        }
     }
 
 }
