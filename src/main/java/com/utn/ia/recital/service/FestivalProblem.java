@@ -12,11 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.util.List;
 import java.util.function.Function;
 import java.util.stream.IntStream;
-
-import static java.util.stream.Collectors.toList;
 
 
 @Service
@@ -37,7 +34,7 @@ public class FestivalProblem implements Problem<ISeq<DayTO>, EnumGene<DayTO>, Do
 
     @Override
     public Codec<ISeq<DayTO>, EnumGene<DayTO>> codec() {
-        return Codecs.ofPermutation(_days);
+        return Codecs.ofSubSet(_days,7);
     }
 
     @Override
@@ -47,16 +44,16 @@ public class FestivalProblem implements Problem<ISeq<DayTO>, EnumGene<DayTO>, Do
 
     private ISeq<DayTO> initialPopulation() {
         return IntStream.iterate(0, i -> i+1)
-                .limit(7)
+                .limit(10000)
                 .mapToObj(i -> new DayTO(randomBands()))
                 .collect(ISeq.toISeq());
     }
 
-    private List<BandTO> randomBands() {
+    private ISeq<BandTO> randomBands() {
         return IntStream.iterate(0, i -> i+1)
                 .limit(4)
                 .mapToObj(i -> RANDOM.nextObject(BandTO.class))
-                .collect(toList());
+                .collect(ISeq.toISeq());
     }
 
 }
